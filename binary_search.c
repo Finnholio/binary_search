@@ -4,37 +4,85 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-int main(void)
+#define SIZE 8
+
+bool search(int needle, int haystack[], int size)
 {
-    int array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-
-
-}
-
-int binsearch(void *elt, size_t size, void *arr, size_t length, int (*compare)(void *, void *))
-{
-    size_t i = length / 2;
-    char *array = arr;
-
-    while (i < length)
+    int start;
+    int end;
+    int middle = size / 2;
+  
+    // base case (if there is only one value left to compare)
+    if (size == 1)
     {
-        int comparison = compare(array + i * size, elt);
-
-        if (comparison == 0)
+        if (needle == haystack[middle])
         {
-            return i;
-        }
-
-        if (comparison < 0)
-        {
-            i += (length - i + 1) / 2;
+            printf("Found it!\n");
+            return 0;
         }
         else
         {
-            length = i;
-            i /= 2;
+            printf("Nope, not here.\n");
+            return 1;
         }
     }
+    
+    // if "needle" is lower than the middle value
+    else if (needle < haystack[middle])
+    {
+        // reset start & end points
+        start = 0;
+        end = middle;
+        
+        // bisect array and initialize new array (a copy)
+        size = size / 2;
+        int new_haystack[size];
+       
+        // store relevant half of old array in new array
+        for (int i = 0; i < size; i++)
+        {
+        	new_haystack[i] = haystack[start];
+            start++;
+        }
+		// recurse!
+        search(needle, new_haystack, size);
+        return 1;
+    }
+    
+    // if "needle" is higher than the middle value
+    else if (needle > haystack[middle - 1])
+    {
+        // reset start & end points
+        start = middle;
+        end = size;
+        
+        // bisect array and initialize new array (a copy)
+        size = size / 2;
+        int new_haystack[size];
 
-    return -1;
+        // store relevant half of old array in new array
+        for (int i = 0; i < size; i++)
+        {
+            new_haystack[i] = haystack[start];
+            start++;
+        }
+        // recurse!
+        search(needle, new_haystack, size);
+        return 1;
+    }
+    
+    // failsafe for the compiler
+    else
+    	return 1;
+}
+
+int main(void)
+{
+    int numbers[SIZE] = { 4, 8, 15, 16, 23, 42, 50, 108 };
+    printf("> ");
+    int n = GetInt(); // get user input (from CS50.h)
+    if (search(n, numbers, SIZE))
+		// search function does not always return correct output
+    	printf("YES\n");
+    return 0;
 }
